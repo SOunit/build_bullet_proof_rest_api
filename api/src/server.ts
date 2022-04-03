@@ -1,10 +1,13 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, json } from "express";
 import db from "./config/database.config";
 
 const app = express();
 
-app.get("/", (req: Request, res: Response) => {
-  return res.send("hello");
+app.use(json());
+
+app.post("/create", (req: Request, res: Response) => {
+  console.log(req.body);
+  return res.send("");
 });
 
 db.sync().then(() => {
