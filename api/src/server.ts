@@ -26,6 +26,15 @@ app.post(
   }
 );
 
+app.get("/read", async (req: Request, res: Response) => {
+  try {
+    const records = await TodoInstance.findAll({ where: {} });
+    res.json(records);
+  } catch (err) {
+    return res.status(500).json({ message: "fail to read", route: "/read" });
+  }
+});
+
 db.sync().then(() => {
   const port = 5000;
   app.listen(port, () => {
