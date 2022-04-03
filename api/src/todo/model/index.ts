@@ -1,5 +1,5 @@
 import { Model, DataTypes } from "sequelize";
-import db from "../config/database.config";
+import db from "../../config/database.config";
 
 interface todoAttributes {
   id: string;
