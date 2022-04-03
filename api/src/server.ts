@@ -4,6 +4,7 @@ import db from "./config/database.config";
 import { TodoInstance } from "./model";
 import TodoValidator from "./validator";
 import Middleware from "./middleware";
+import middleware from "./middleware";
 
 const app = express();
 
@@ -26,14 +27,39 @@ app.post(
   }
 );
 
-app.get("/read", async (req: Request, res: Response) => {
-  try {
-    const records = await TodoInstance.findAll({ where: {} });
-    res.json(records);
-  } catch (err) {
-    return res.status(500).json({ message: "fail to read", route: "/read" });
+app.get(
+  "/read",
+  TodoValidator.checkReadTodo(),
+  Middleware.handleValidationError,
+  async (req: Request, res: Response) => {
+    try {
+      const limit = req.query?.limit as number | undefined;
+      const offset = req.query?.offset as number | undefined;
+
+      const records = await TodoInstance.findAll({ where: {}, limit, offset });
+      res.json(records);
+    } catch (err) {
+      return res.status(500).json({ message: "fail to read", route: "/read" });
+    }
   }
-});
+);
+
+app.get(
+  "/read/:id",
+  TodoValidator.checkIdParam(),
+  middleware.handleValidationError,
+  async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const record = await TodoInstance.findOne({ where: { id } });
+      return res.json(record);
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: "fail to read", route: "/read/:id" });
+    }
+  }
+);
 
 db.sync().then(() => {
   const port = 5000;
