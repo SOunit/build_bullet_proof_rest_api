@@ -61,6 +61,32 @@ app.get(
   }
 );
 
+app.put(
+  "/update/:id",
+  TodoValidator.checkIdParam(),
+  Middleware.handleValidationError,
+  async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const record = await TodoInstance.findOne({ where: { id } });
+
+      if (!record) {
+        return res.json({ message: "Can not find existing record" });
+      }
+
+      const updatedRecord = await record.update({
+        completed: !record.getDataValue("completed"),
+      });
+
+      return res.json(updatedRecord);
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: "fail to update", route: "/update/:id" });
+    }
+  }
+);
+
 db.sync().then(() => {
   const port = 5000;
   app.listen(port, () => {
